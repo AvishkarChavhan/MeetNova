@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { AuthContext } from '../contexts/AuthContext.jsx'
 import { useNavigate } from 'react-router-dom';
 import "../App.css";
@@ -10,19 +10,21 @@ export default function History() {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
+    // Wrap in useCallback so it's stable and safe to use as a dependency
+    const fetchHistory = useCallback(async () => {
+        try {
+            const history = await getHistoryOfUser();
+            setMeetings(history || []);
+        } catch {
+            setMeetings([]);
+        } finally {
+            setLoading(false);
+        }
+    }, [getHistoryOfUser]); // eslint-disable-line react-hooks/exhaustive-deps
+
     useEffect(() => {
-        const fetchHistory = async () => {
-            try {
-                const history = await getHistoryOfUser();
-                setMeetings(history || []);
-            } catch {
-                setMeetings([]);
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchHistory();
-    }, []);
+    }, [fetchHistory]);
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);

@@ -11,7 +11,7 @@ import ScreenShareIcon from '@mui/icons-material/ScreenShare';
 import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
 import ChatIcon from '@mui/icons-material/Chat';
 
-const server_url = "https://meetnova-mtfo.onrender.com";
+const server_url = "http://localhost:8000";
 
 // Peer connections live outside component to avoid re-creation on re-render
 var connections = {};
@@ -106,19 +106,20 @@ export default function VideoMeetComponent() {
     };
 
     const replaceTracksAndOffer = (stream) => {
-        for (let id in connections) {
-            if (id === socketIdRef.current) continue;
-            const senders = connections[id].getSenders();
+        Object.keys(connections).forEach(id => {
+            if (id === socketIdRef.current) return;
+            const pc = connections[id];
+            const senders = pc.getSenders();
             stream.getTracks().forEach(track => {
                 const sender = senders.find(s => s.track?.kind === track.kind);
                 if (sender) sender.replaceTrack(track);
-                else connections[id].addTrack(track, stream);
+                else pc.addTrack(track, stream);
             });
-            connections[id].createOffer()
-                .then(desc => connections[id].setLocalDescription(desc))
-                .then(() => socketRef.current.emit('signal', id, JSON.stringify({ sdp: connections[id].localDescription })))
+            pc.createOffer()
+                .then(desc => pc.setLocalDescription(desc))
+                .then(() => socketRef.current.emit('signal', id, JSON.stringify({ sdp: pc.localDescription })))
                 .catch(e => console.log(e));
-        }
+        });
     };
 
     const getUserMediaSuccess = (stream) => {
@@ -310,11 +311,6 @@ export default function VideoMeetComponent() {
         } else {
             window.location.href = "/home";
         }
-    };
-
-    const addMessage = (data, sender, socketIdSender) => {
-        setMessages(prev => [...prev, { sender, data }]);
-        if (socketIdSender !== socketIdRef.current) setNewMessages(p => p + 1);
     };
 
     const sendMessage = () => {
