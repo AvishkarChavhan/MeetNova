@@ -8,7 +8,11 @@ let roomAdmin   = {};   // roomPath → socketId of admin (first joiner)
 export const connectToSocket = (server) => {
     const io = new Server(server, {
         cors: {
-            origin: "*",
+            origin: [
+                "http://localhost:3000",
+                "https://meet-nova-c7p0ajerp-avishkarchavhans-projects.vercel.app",
+                /\.vercel\.app$/  // allows all vercel preview URLs too
+            ],
             methods: ["GET", "POST"],
             allowedHeaders: ["*"],
             credentials: true

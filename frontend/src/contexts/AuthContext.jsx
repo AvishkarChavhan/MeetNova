@@ -5,8 +5,10 @@ import { useNavigate } from "react-router-dom";
 
 export const AuthContext = createContext({});
 
+const BACKEND_URL = "https://meetnova-mtfo.onrender.com";
+
 const client = axios.create({
-    baseURL: `https://meetnova-mtfo.onrender.com`
+    baseURL: `${BACKEND_URL}/api/v1/users`
 });
 
 export const AuthProvider = ({ children }) => {
