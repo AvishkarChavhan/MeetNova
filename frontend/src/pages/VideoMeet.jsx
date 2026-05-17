@@ -404,7 +404,14 @@ export default function VideoMeetComponent() {
                     {showModal && (
                         <div className={styles.chatRoom}>
                             <div className={styles.chatContainer}>
-                                <h1>Chat</h1>
+                                <div className={styles.chatHeader}>
+                                    <h1>Chat</h1>
+                                    <button
+                                        className={styles.chatCloseBtn}
+                                        onClick={() => setModal(false)}
+                                        title="Close chat"
+                                    >✕</button>
+                                </div>
                                 <div className={styles.chattingDisplay}>
                                     {messages.length > 0
                                         ? messages.map((item, i) => (
